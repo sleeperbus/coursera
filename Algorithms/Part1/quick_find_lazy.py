@@ -1,4 +1,4 @@
-class QuickFindUFLazy:
+class QuickFind:
 	def __init__(self, n):
 		self.data = range(n)
 

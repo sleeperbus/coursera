@@ -1,28 +1,26 @@
 import quick_find_eager_approach as eager 
+import quick_find_lazy as lazy
 import time as time
 import random 
 
 startSize = 1000
 multiplier = 2
 
-def eagerVersion(n):
-	# eager version test
-	testEager = eager.QuickFindUFEager(n)
+def execTest(obj, n):
 	start = time.time()
-	data = range(n-1)
-	random.shuffle(data)
+	obj.data = range(n)
+	random.shuffle(obj.data)
 
-	for idx in (range(len(data)-1)):
-		testEager.union(data[idx], data[idx+1])
+	for idx in (range(len(obj.data)-1)):
+		obj.union(obj.data[idx], obj.data[idx+1])
 	return time.time() - start	
 
-
-def testEager(xTimes):
+def test(obj, xTimes):
 	testCount = xTimes
 	dataSize = startSize
 	while testCount > 0:
 		start = time.time()
-		execTimes = eagerVersion(dataSize)
+		execTimes = execTest(obj, dataSize)
 		end = time.time() - start
 
 		print "n: %d, time: %f" % (dataSize, end)
@@ -30,9 +28,10 @@ def testEager(xTimes):
 
 		dataSize = 2 * dataSize
 
+eagerObj = eager.QuickFind(startSize)
+test(eagerObj, 5)
 
-testEager(4)
-
+#lazyObj = lazy.QuickFind(startSize)
 
 
 

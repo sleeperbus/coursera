@@ -1,6 +1,4 @@
-import time
-
-class QuickFindUFEager:
+class QuickFind:
 	def __init__(self, n):
 		self.data = range(n)
 
@@ -8,6 +6,7 @@ class QuickFindUFEager:
 		return self.data[p] == self.data[q]
 
 	def union(self, p, q):
+#		print "p is %d, q is %d\n" %(p, q)
 		pid = self.data[p]
 		qid = self.data[q]
 

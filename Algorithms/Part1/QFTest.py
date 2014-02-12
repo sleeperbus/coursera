@@ -1,10 +1,11 @@
 import quick_find_eager as eager 
 import quick_find_lazy as lazy
 import quick_find_improve as improve
+import quick_find_compress as compress
 import time as time
 import random 
 
-startSize = 1000
+startSize = 10000000
 multiplier = 2
 
 def execTest(obj, n):
@@ -33,20 +34,23 @@ def test(obj, xTimes):
 
 		dataSize = 2 * dataSize
 
-eagerObj = eager.QuickFind(startSize)
-test(eagerObj, 5)
+#eagerObj = eager.QuickFind(startSize)
+#test(eagerObj, 5)
 
-print "\n"
+print "\nLazy"
 
 lazyObj = lazy.QuickFind(startSize)
-test(lazyObj, 5)
+test(lazyObj, 1)
 
-print "\n"
+print "\nImprove"
 
 improveObj = improve.QuickFind(startSize)
-test(improveObj, 5)
+test(improveObj, 1)
 
+print "\nCompress"
 
+compressObj = compress.QuickFind(startSize)
+test(compressObj, 1)
 
 
 

@@ -9,7 +9,7 @@ multiplier = 2
 def execTest(obj, n):
 	start = time.time()
 	obj.data = range(n)
-	random.shuffle(obj.data)
+#	random.shuffle(obj.data)
 
 	for idx in (range(len(obj.data)-1)):
 		obj.union(obj.data[idx], obj.data[idx+1])
@@ -31,7 +31,8 @@ def test(obj, xTimes):
 eagerObj = eager.QuickFind(startSize)
 test(eagerObj, 5)
 
-#lazyObj = lazy.QuickFind(startSize)
+lazyObj = lazy.QuickFind(startSize)
+test(lazyObj, 5)
 
 
 

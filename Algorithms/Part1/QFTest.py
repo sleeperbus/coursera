@@ -5,19 +5,22 @@ import quick_find_compress as compress
 import time as time
 import random 
 
-startSize = 10000000
+startSize = 1000
 multiplier = 2
 
 def execTest(obj, n):
 	start = time.time()
 	obj.data = range(n)
-	testSet = range(n)
-	random.shuffle(testSet)
+	obj.sz = range(n)
+	testSet1 = range(n)
+	testSet2 = range(n)
+	random.shuffle(testSet1)
+	random.shuffle(testSet2)
 
-	while  len(testSet) > 0:
-		p = testSet.pop()
-		q = testSet.pop()
-		obj.union(obj.data[q], obj.data[q])
+	while  len(testSet1) > 0:
+		p = testSet1.pop()
+		q = testSet2.pop()
+		obj.union(obj.data[p], obj.data[q])
 
 	return time.time() - start	
 
@@ -37,20 +40,20 @@ def test(obj, xTimes):
 #eagerObj = eager.QuickFind(startSize)
 #test(eagerObj, 5)
 
-print "\nLazy"
+#print "\nLazy"
 
-lazyObj = lazy.QuickFind(startSize)
-test(lazyObj, 1)
+#lazyObj = lazy.QuickFind(startSize)
+#test(lazyObj, 1)
 
-print "\nImprove"
+#print "\nImprove"
 
-improveObj = improve.QuickFind(startSize)
-test(improveObj, 1)
+#improveObj = improve.QuickFind(startSize)
+#test(improveObj, 10)
 
 print "\nCompress"
 
 compressObj = compress.QuickFind(startSize)
-test(compressObj, 1)
+test(compressObj, 5)
 
 
 

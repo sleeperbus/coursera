@@ -31,7 +31,7 @@ def testEager(xTimes):
 		dataSize = 2 * dataSize
 
 
-testEager(8)
+testEager(4)
 
 
 

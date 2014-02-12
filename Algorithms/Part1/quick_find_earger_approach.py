@@ -1,4 +1,6 @@
-class QuickFindUF:
+import time
+
+class QuickFindUFEager:
 	def __init__(self, n):
 		self.data = range(n)
 
@@ -13,11 +15,3 @@ class QuickFindUF:
 			if self.data[idx] == pid:
 				self.data[idx] = qid
 
-
-testSet = QuickFindUF(100)
-testSet.union(1, 50)
-testSet.union(3, 2)
-testSet.union(50, 23)
-print testSet.connected(1, 50)
-print testSet.connected(1, 23)
-print testSet.connected(3, 10)				

@@ -1,0 +1,113 @@
+CREATE OR REPLACE PROCEDURE SY.NPEI_MAKE_DEPR_INFO(
+	P_ASST_NO		IN SY.NEIE02M00.ASST_NO%TYPE
+	,P_DT			IN DATE
+)
+IS
+/*
+ | 해당 자산의 상각정보를 생성한다.
+ | [예외사항]
+ |	일반적인 자산은 내용년수 x 12개월만큼의 자료를 생성하지만 특정자산,
+ |	예를 들어 토지, 예술품 등의 상각하지 않는 자산은 최초 하나의 row 만
+ |	생성한다.
+ | [수정사항]
+ |	2013.09.03	지호준
+ |		자산구분(공통,투신,증권) 구분 수정
+ |			기존 => NULL
+ |			신규 => 취득시의 구분자
+ |		특수자산에 속하는 구분 코드 수정
+*/
+	L_ASST_INFO			SY.NEIE02M00%ROWTYPE;
+	LN_IDX				NUMBER;
+	LN_EACH_DEPR_AMT	NUMBER;
+	LN_DEPR_ACCM_AMT	NUMBER := 0;
+
+	/*
+	 | 기존에 생성된 자산인지 확인한다.
+	*/
+	FUNCTION IS_EXISTING_ASST(I_ASST_NO IN SY.NEIE02M00.ASST_NO%TYPE)
+	RETURN BOOLEAN
+	IS
+		LN_TMP		NUMBER;
+	BEGIN
+		SELECT	1
+		INTO	LN_TMP
+		FROM	SY.NEIE03M00 A
+		WHERE	A.ASST_NO = I_ASST_NO
+		AND		ROWNUM = 1
+		;
+		RETURN TRUE;
+	EXCEPTION
+		WHEN NO_DATA_FOUND THEN
+			RETURN FALSE;
+	END IS_EXISTING_ASST;
+
+
+	/*
+	 | 특수자산인지 확인한다.
+	 | 예를 들어, 토지는 특수자산이다.
+	*/
+	FUNCTION IS_SPECIAL_ASST(I_ASST_NO IN SY.NEIE02M00.ASST_NO%TYPE)
+	RETURN BOOLEAN
+	IS
+	BEGIN
+		-- 토지
+		IF I_ASST_NO LIKE 'A%' THEN
+			RETURN TRUE;
+		-- 예술품
+		ELSIF I_ASST_NO LIKE 'EAR%' THEN
+			RETURN TRUE;
+		ELSE
+			RETURN FALSE;
+		END IF;
+	END IS_SPECIAL_ASST;
+
+
+
+/*
+ | 메인모듈 
+*/
+BEGIN
+	IF IS_EXISTING_ASST(P_ASST_NO) THEN
+		RAISE_APPLICATION_ERROR(-20112, P_ASST_NO || '의 상각정보가 존재합니다..');
+	END IF;
+
+	L_ASST_INFO := SY.NFEI_ASSET_INFO(P_ASST_NO);	
+
+	-- 특수자산인 경우 하나의 row 만 생성한다.
+	IF IS_SPECIAL_ASST(P_ASST_NO) THEN
+		INSERT INTO SY.NEIE03M00
+		VALUES (
+			P_ASST_NO
+			, TO_CHAR(P_DT, 'YYYYMM')
+			, 0
+			, LAST_DAY(P_DT)
+			, 'N'
+			, L_ASST_INFO.GET_AMT
+			, L_ASST_INFO.ASST_TP
+		);
+	-- 일반자산인 경우, 내용년수 x 12 만큼의 자료를 생성한다.
+	ELSE
+		LN_IDX := L_ASST_INFO.USE_YYS * 12;
+
+		FOR IDX IN 1..LN_IDX LOOP
+			LN_EACH_DEPR_AMT := SY.NFEI_DIVIDE_ASSET_AMT(L_ASST_INFO.GET_AMT - 1000, 
+					LN_IDX, IDX);
+			LN_DEPR_ACCM_AMT := LN_DEPR_ACCM_AMT + LN_EACH_DEPR_AMT;	
+
+			INSERT INTO SY.NEIE03M00
+			VALUES (
+				P_ASST_NO
+				, TO_CHAR(ADD_MONTHS(P_DT, IDX-1), 'YYYYMM')
+				, LN_EACH_DEPR_AMT
+				, LAST_DAY(ADD_MONTHS(P_DT, IDX-1))
+				, 'N'
+				, L_ASST_INFO.GET_AMT - LN_DEPR_ACCM_AMT
+				, L_ASST_INFO.ASST_TP
+			);	
+		END LOOP;
+	END IF;
+END NPEI_MAKE_DEPR_INFO;
+/
+GRANT EXECUTE ON SY.NPEI_MAKE_DEPR_INFO TO CJ,CJC,CJD,CJE,CJS,CJX,CJX_S;
+SHOW ERROR
+

@@ -1,7 +1,7 @@
 class QuickFind:
 	def __init__(self, n):
 		self.data = range(n)
-		self.sz = range(n)
+		self.sz = n * [1]
 
 	def myRoot(self, i):
 		while i != self.data[i]:
@@ -23,3 +23,5 @@ class QuickFind:
 		else:
 			self.data[j] = i
 			self.sz[i] = self.sz[i] + self.sz[j]
+		print self.data	
+		print self.sz
